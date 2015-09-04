@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+<modules>
+	
+	<module>
+		<modulename>HazelCastManager</modulename>
+		<classname>com.tao.realweb.modules.system.hazelcast.HazelCastManager</classname>
+		<description>HazelCastManager启动</description>
+	</module>
+	<module>
+		<modulename>SessionManager</modulename>
+		<classname>com.tao.realweb.modules.system.session.SessionManager</classname>
+		<description>SessionManager启动</description>
+	</module>
+	<module>
+		<modulename>HandlerManager</modulename>
+		<classname>com.tao.realweb.modules.system.handlers.HandlerManager</classname>
+		<description>HandlerManager启动</description>
+	</module>
+	<module>
+		<modulename>InterceptorManager</modulename>
+		<classname>com.tao.realweb.modules.system.interceptors.InterceptorManager</classname>
+		<description>InterceptorManager启动</description>
+	</module>
+	<module>
+		<modulename>PacketRoutingManager</modulename>
+		<classname>com.tao.realweb.modules.system.routing.PacketRoutingManager</classname>
+		<description>PacketRoutingManager启动</description>
+	</module>
+	
+	<module>
+		<modulename>ChatServerManager</modulename>
+		<classname>com.tao.realweb.modules.system.chat.ChatServerManager</classname>
+		<description>ChatDispatcherServer启动</description>
+	</module>
+	<!--
+	<module>
+		<modulename>HandlerDispatcherServer</modulename>
+		<classname>com.tao.realweb.modules.system.handlerdispatcher.HandlerDispatcherServer</classname>
+		<description>HandlerDispatcherServer启动</description>
+	</module>
+	-->
+</modules>
+<handlers>
+	<!--
+	<handler>
+		<namespace>exampleHandler</namespace>
+		<classname>com.tao.realweb.modules.system.handlers.system.example.ExampleHandler</classname>
+		<description>Handler处理例子</description>
+		<parameters>
+			
+		</parameters>
+	</handler>
+	-->
+</handlers>
+<interceptors>
+	<!--
+	<interceptor>
+		<namespace>http://www.tao.com/authInterceptor</namespace>
+		<classname></classname>
+		<description></description>
+	</interceptor>
+	-->
+</interceptors>
+<plugins>
+	<!--
+	<plugin>
+		<pluginname>HandlerDispatcherClient</pluginname>
+		<classname>com.tao.realweb.plugins.system.handlerclient.HandlerDispatcherClient</classname>
+		<description>HandlerDispatcherClient启动</description>
+		<parameters>
+			<servers>http://localhost:9092/handler</servers>
+			<username>wangtao</username>
+			<password>wangtao</password>
+		</parameters>
+	</plugin>
+	-->
+	<plugin>
+		<pluginname>JettyPlugin</pluginname>
+		<classname>com.tao.realweb.plugins.system.jetty.JettyPlugin</classname>
+		<description>JettyPlugin启动</description>
+		<parameters>
+			<servers>http://localhost:9092/handler</servers>
+			<username>wangtao</username>
+			<password>wangtao</password>
+		</parameters>
+	</plugin>
+</plugins>
+<properties>
+	<realweb.dommain>domain1</realweb.dommain>
+	<realweb.hostname>hostname1</realweb.hostname>
+	<realweb.version>1.0</realweb.version>
+	<realweb.ip>127.0.0.1</realweb.ip>
+	<realweb.port>9094</realweb.port>
+	<realweb.redis.threadSize>2</realweb.redis.threadSize>
+	<realweb.redis.url>192.168.232.2:6379</realweb.redis.url>
+	<!--
+	<realweb.plugin.dir></realweb.plugin.dir>
+	-->
+	<realweb.handler.threadsize>2</realweb.handler.threadsize>
+</properties>
+
+
+
+</application>
+	
