@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<pluginname>JettyPlugin</pluginname>
+	<classname>com.tao.realweb.plugins.system.jetty.JettyPlugin</classname>
+	<description>JettyPlugin启动</description>
+	<parameters>
+		<servers>http://localhost:9092/handler</servers>
+		<username>wangtao</username>
+		<password>wangtao</password>
+	</parameters>
+</plugin>

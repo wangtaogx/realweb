@@ -470,6 +470,7 @@ public class PluginManager {
 					}
                 }
                 plugin.init(this, info);
+                plugin.start();
             }
         }
         catch (Throwable e) {

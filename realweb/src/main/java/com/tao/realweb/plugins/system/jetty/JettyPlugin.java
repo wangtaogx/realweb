@@ -2,6 +2,8 @@ package com.tao.realweb.plugins.system.jetty;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.tao.realweb.plugins.basic.AbstractPlugin;
 import com.tao.realweb.plugins.basic.PluginInfo;
@@ -10,6 +12,7 @@ import com.tao.realweb.plugins.basic.PluginManager;
 public class JettyPlugin extends AbstractPlugin{
 
 	Server server ;
+	private Logger logger = LoggerFactory.getLogger(JettyPlugin.class);
 	@Override
 	public void init(PluginManager pluginManager, PluginInfo info) {
 		super.init(pluginManager, info);
@@ -31,6 +34,7 @@ public class JettyPlugin extends AbstractPlugin{
 		new Thread(){
 			public void run() {
 				try{
+				logger.debug(getPluginInfo().getPluginName()+"   start......................");
 				server.start();  
 			     server.join();
 				}catch(Exception e){

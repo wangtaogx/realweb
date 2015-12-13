@@ -85,11 +85,11 @@ public class MyFrame extends javax.swing.JFrame  implements ActionListener{
 	}
 	public MyFrame() {
 		super();
+		initServer();
 		initGUI();
 	}
 	private void initGUI() {
 		try {
-			
 			BorderLayout thisLayout = new BorderLayout();
 			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			this.setUndecorated(true);
@@ -325,6 +325,12 @@ public class MyFrame extends javax.swing.JFrame  implements ActionListener{
 			worker.start();
 		}
 	}
+	private void initServer(){
+		if(serverStarter == null){
+			serverStarter = new ServerStarter();
+			serverStarter.init();
+		}
+	}
 	private void stopServer() {
 		if(serverStarter != null){
 			serverStarter.stop();
@@ -333,8 +339,7 @@ public class MyFrame extends javax.swing.JFrame  implements ActionListener{
 		}
 	}
 	private void startServer() {
-		if(serverStarter == null){
-			serverStarter = new ServerStarter();
+		if(serverStarter != null){
 			serverStarter.start();
 			fireStart();
 		}

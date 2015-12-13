@@ -31,6 +31,7 @@ public class RealWebServer {
 		preferenceManager = PreferenceManager.getInstance();
 		preferenceManager.addPreference(realWebConfig);
 		serverInfo = new RealWebServerInfo(realWebConfig.getString("realweb.dommain"),this.realWebConfig.getString("realweb.hostname"),this.realWebConfig.getString("realweb.version"),new Date());
+		serverInfo.setIp(serverInfo.getHostname());
 	}
 	public void start(){
 		TaskExecutor.getInstance();

@@ -11,6 +11,7 @@ public class RealWebResource extends AbstractPropertiesPreference{
 
 	public static final String NAMESPACE = "RealWebResource";
 	public static RealWebResource instance = null ;
+	private String resourceURL;
 	private static Object lock = new Object();
 	public synchronized static RealWebResource getInstance(){
 		if(instance == null){
@@ -22,6 +23,15 @@ public class RealWebResource extends AbstractPropertiesPreference{
 		}
 		return instance;
 	}
+	
+	public String getResourceURL() {
+		return resourceURL;
+	}
+
+	public void setResourceURL(String resourceURL) {
+		this.resourceURL = resourceURL;
+	}
+
 	public String getNamespace() {
 		return NAMESPACE;
 	}
@@ -44,7 +54,7 @@ public class RealWebResource extends AbstractPropertiesPreference{
 	public ImageIcon getImageResource(String key){
 		String resourcePath = getString(key);
 		if(!StringUtil.isEmpty(key)){
-			URL url = getClass().getClassLoader().getResource(resourcePath);
+			String url = resourceURL+"/"+resourcePath;
 			return new ImageIcon(url);
 		}
 		return null;

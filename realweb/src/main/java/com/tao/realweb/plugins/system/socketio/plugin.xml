@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<pluginname>SocketIOPlugin</pluginname>
+	<classname>com.tao.realweb.plugins.system.socketio.SocketIOPlugin</classname>
+	<description>SocketIOPlugin启动</description>
+	<parameters>
+		<socketio.port>9094</socketio.port>
+	</parameters>
+</plugin>

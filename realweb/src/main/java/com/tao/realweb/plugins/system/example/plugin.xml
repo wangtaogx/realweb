@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<pluginname>ExamplePlugin</pluginname>
+	<classname>com.tao.realweb.plugins.system.example.ExamplePlugin</classname>
+	<description>ExamplePlugin</description>
+</plugin>
