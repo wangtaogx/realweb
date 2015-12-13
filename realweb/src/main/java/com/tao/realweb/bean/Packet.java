@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tao.realweb.util.StringUtil;
 
@@ -76,7 +77,7 @@ public abstract class Packet implements Serializable{
     private String to = null;
     private String from = null;
     private String header;
-    protected Map<String,String> properties = new LinkedHashMap<String, String>();
+    protected JSONObject properties = new JSONObject();
     private PacketError error;
     public Packet() {
     }
@@ -197,12 +198,12 @@ public abstract class Packet implements Serializable{
     }
     @JsonIgnore
     public String getProperty(String key){
-    	return properties.get(key);
+    	return properties.getString(key);
     }
     public void setProperty(String key,String value){
     	properties.put(key, value);
     }
-	public Map<String, String> getProperties() {
+	public JSONObject getProperties() {
 		return properties;
 	}
 

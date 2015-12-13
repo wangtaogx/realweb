@@ -73,7 +73,7 @@
 </plugins>
 <properties>
 	<realweb.dommain>domain1</realweb.dommain>
-	<realweb.hostname>127.0.1.1</realweb.hostname>
+	<realweb.hostname>192.168.1.111</realweb.hostname>
 	<realweb.version>1.0</realweb.version>
 	<realweb.redis.threadSize>2</realweb.redis.threadSize>
 	<realweb.redis.url>192.168.232.2:6379</realweb.redis.url>
