@@ -1,5 +1,6 @@
 package com.tao.realweb.modules.system.session;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,6 +59,12 @@ public class SessionManager extends AbstractModule{
 		if(session != null){
 			session.sendMessage(packet);
 			packet = null;
+		}
+	}
+	public void sendPacketToAll(Packet packet){
+		Collection<Session> sessions = getClientMap(DEFAULT_CHAT_NAMESPACE).values();
+		for(Session s : sessions){
+			s.sendMessage(packet);
 		}
 	}
 	public void start() {

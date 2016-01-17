@@ -25,6 +25,7 @@
 		<realweb.plugins.jetty>${realweb.plugins}/jetty</realweb.plugins.jetty>
 		<realweb.plugins.socketio>${realweb.plugins}/socketio</realweb.plugins.socketio>
 		<realweb.plugins.example>${realweb.plugins}/example</realweb.plugins.example>
+		<realweb.plugins.netty>${realweb.plugins}/netty</realweb.plugins.netty>
 	</properties>
 	<build>
 		<plugins>
@@ -41,6 +42,7 @@
 					<configuration>
 						<outputDirectory>${realweb.plugins}</outputDirectory>
 						<resources>  
+						<!-- jetty-->
 							<resource>
 								<directory>${realweb.classes}/com/tao/realweb/plugins/system/jetty</directory>
 								<targetPath>${realweb.plugins.jetty}/classes/com/tao/realweb/plugins/system/jetty</targetPath>
@@ -82,11 +84,25 @@
 								<directory>src/main/resources/lib</directory>
 								<targetPath>${realweb.plugins.socketio}/lib</targetPath>
 								<includes>
-									<include>jetty-all-9.2.10.v20150310.jar</include>
-									<include>servlet-api-3.1.jar</include>
+									<include>netty-socketio-1.6.3.jar</include>
 								</includes>
 							</resource>
-							
+							<!-- netty-->
+							<resource>
+								<directory>${realweb.classes}/com/tao/realweb/plugins/system/netty</directory>
+								<targetPath>${realweb.plugins.netty}/classes/com/tao/realweb/plugins/system/netty</targetPath>
+								<excludes>  
+									<exclude>plugin.xml</exclude>  
+								</excludes>  
+							</resource>        
+							<resource>
+								<directory>${realweb.classes}/com/tao/realweb/plugins/system/netty</directory>
+								<targetPath>${realweb.plugins.netty}</targetPath>
+								<includes>  
+									<include>plugin.xml</include>  
+								</includes>  
+							</resource>
+							<!-- example-->
 							<resource>
 								<directory>${realweb.classes}/com/tao/realweb/plugins/system/example</directory>
 								<targetPath>${realweb.plugins.example}/classes/com/tao/realweb/plugins/system/example</targetPath>
@@ -224,6 +240,21 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>netty</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<classesDirectory>${realweb.plugins.netty}</classesDirectory>
+							<finalName>netty</finalName>
+							<outputDirectory>${realweb.plugins}</outputDirectory>
+							<archive>
+								<addMavenDescriptor>false</addMavenDescriptor> 
+							</archive>
+						</configuration>
+					</execution>
+					<execution>
 						<id>example</id>
 						<goals>
 							<goal>jar</goal>
@@ -253,6 +284,9 @@
 						</goals>
 						<configuration>
 							<outputDirectory>${realweb.lib}</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
 						</configuration>
 					</execution>
 				</executions>

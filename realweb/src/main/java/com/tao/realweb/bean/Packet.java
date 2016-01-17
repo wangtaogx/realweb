@@ -20,208 +20,152 @@
 
 package com.tao.realweb.bean;
 
-
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tao.realweb.util.StringUtil;
 
-/**
- * Base class for XMPP packets. Every packet has a unique ID (which is automatically
- * generated, but can be overriden). Optionally, the "to" and "from" fields can be set,
- * as well as an arbitrary number of properties.
- *
- * Properties provide an easy mechanism for clients to share data. Each property has a
- * String name, and a value that is a Java primitive (int, long, float, double, boolean)
- * or any Serializable object (a Java object is Serializable when it implements the
- * Serializable interface).
- *
- * @author Matt Tucker
- */
-public abstract class Packet implements Serializable{
+public class Packet implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public static final String ACTION_WRITE = "ACTION_WRITE";
+	public static final String ACTION_READ = "ACTION_READ";
+	private static String prefix = StringUtil.randomString(5) + "-";
+	private static long id = 0;
+	private String action;
+	private String namespace;
+	private String status = "0";
+	private boolean isEncrpt = true;
+	private JSONObject body = new JSONObject();
+	private JSONObject header = new JSONObject();
+	private String packetID = null;
+	private String to = null;
+	private String from = null;
 
-    /**
-     * Constant used as packetID to indicate that a packet has no id. To indicate that a packet
-     * has no id set this constant as the packet's id. When the packet is asked for its id the
-     * answer will be <tt>null</tt>.
-     */
-    public static final String ID_NOT_AVAILABLE = "ID_NOT_AVAILABLE";
-
-    /**
-     * A prefix helps to make sure that ID's are unique across mutliple instances.
-     */
-    private static String prefix = StringUtil.randomString(5) + "-";
-
-    /**
-     * Keeps track of the current increment, which is appended to the prefix to
-     * forum a unique ID.
-     */
-    private static long id = 0;
-
-    /**
-     * Returns the next unique id. Each id made up of a short alphanumeric
-     * prefix along with a unique numeric value.
-     *
-     * @return the next id.
-     */
-    public static synchronized String nextID() {
-        return prefix + Long.toString(id++);
+	public Packet() {
+	}
+	public Packet(Packet p) {
+        this(p.getAction(),p.getPacketID(),p.getTo(),p.getFrom(),p.getNamespace());
     }
-
-    private String packetID = null;
-    private String to = null;
-    private String from = null;
-    private String header;
-    protected JSONObject properties = new JSONObject();
-    private PacketError error;
-    public Packet() {
-    }
-
-    public Packet(Packet p) {
-        this(p.getHeader(),p.getPacketID(),p.getTo(),p.getFrom());
-    }
-    public Packet(String header,String packetID,String to,String from){
-    	this.header = header;
+    public Packet(String action,String packetID,String to,String from,String namespace){
+    	this.action = action;
     	this.packetID = packetID;
     	this.from = from;
     	this.to = to;
+    	this.namespace = namespace;
     }
-    /**
-     * Returns the unique ID of the packet. The returned value could be <tt>null</tt> when
-     * ID_NOT_AVAILABLE was set as the packet's id.
-     *
-     * @return the packet's unique ID or <tt>null</tt> if the packet's id is not available.
-     */
-    public String getPacketID() {
-        if (ID_NOT_AVAILABLE.equals(packetID)) {
-            return null;
-        }
-
-        if (packetID == null) {
-            packetID = nextID();
-        }
-        return packetID;
-    }
-
-    /**
-     * Sets the unique ID of the packet. To indicate that a packet has no id
-     * pass the constant ID_NOT_AVAILABLE as the packet's id value.
-     *
-     * @param packetID the unique ID for the packet.
-     */
-    public void setPacketID(String packetID) {
-        this.packetID = packetID;
-    }
-
-    /**
-     * Returns who the packet is being sent "to", or <tt>null</tt> if
-     * the value is not set. The XMPP protocol often makes the "to"
-     * attribute optional, so it does not always need to be set.<p>
-     *
-     * The StringUtils class provides several useful methods for dealing with
-     * XMPP addresses such as parsing the
-     * {@link StringUtil#parseBareAddress(String) bare address},
-     * {@link StringUtil#parseName(String) user name},
-     * {@link StringUtil#parseServer(String) server}, and
-     * {@link StringUtil#parseResource(String) resource}.  
-     *
-     * @return who the packet is being sent to, or <tt>null</tt> if the
-     *      value has not been set.
-     */
-    public String getTo() {
-        return to;
-    }
-
-    /**
-     * Sets who the packet is being sent "to". The XMPP protocol often makes
-     * the "to" attribute optional, so it does not always need to be set.
-     *
-     * @param to who the packet is being sent to.
-     */
-    public void setTo(String to) {
-        this.to = to;
-    }
-
-    /**
-     * Returns who the packet is being sent "from" or <tt>null</tt> if
-     * the value is not set. The XMPP protocol often makes the "from"
-     * attribute optional, so it does not always need to be set.<p>
-     *
-     * The StringUtils class provides several useful methods for dealing with
-     * XMPP addresses such as parsing the
-     * {@link StringUtil#parseBareAddress(String) bare address},
-     * {@link StringUtil#parseName(String) user name},
-     * {@link StringUtil#parseServer(String) server}, and
-     * {@link StringUtil#parseResource(String) resource}.  
-     *
-     * @return who the packet is being sent from, or <tt>null</tt> if the
-     *      value has not been set.
-     */
-    public String getFrom() {
-        return from;
-    }
-
-    /**
-     * Sets who the packet is being sent "from". The XMPP protocol often
-     * makes the "from" attribute optional, so it does not always need to
-     * be set.
-     *
-     * @param from who the packet is being sent to.
-     */
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    /**
-     * Returns the error associated with this packet, or <tt>null</tt> if there are
-     * no errors.
-     *
-     * @return the error sub-packet or <tt>null</tt> if there isn't an error.
-     */
-    public PacketError getError() {
-      
-        return this.error;
-    }
-
-    /**
-     * Sets the error for this packet.
-     *
-     * @param error the error to associate with this packet.
-     */
-    public void setError(PacketError error) {
-    	this.error = error;
-    }
-    @JsonIgnore
-    public String getProperty(String key){
-    	return properties.getString(key);
-    }
-    public void setProperty(String key,String value){
-    	properties.put(key, value);
-    }
-	public JSONObject getProperties() {
-		return properties;
+	public String getAction() {
+		return action;
 	}
 
-	public String getHeader() {
+	public void setAction(String action) {
+		this.action = action;
+	}
+	public boolean isEncrpt() {
+		return isEncrpt;
+	}
+
+	public void setEncrpt(boolean isEncrpt) {
+		this.isEncrpt = isEncrpt;
+	}
+
+	public JSONObject getHeader() {
 		return header;
 	}
-
-	public void setHeader(String header) {
+	public void setHeader(JSONObject header) {
 		this.header = header;
 	}
+	public JSONObject getBody() {
+		return body;
+	}
+	public void setBody(JSONObject body) {
+		this.body = body;
+	}
+	public String getPacketID() {
+		return packetID;
+	}
 
-	public boolean equals(Object o) {
-    	if(o instanceof Packet){
-    		Packet p = (Packet)o;
-    		if(p.getPacketID() == this.packetID)
-    			return true;
-    	}
-    	return false;
-    }
+	public void setPacketID(String packetID) {
+		this.packetID = packetID;
+	}
 
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
+	}
+
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+		;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getNamespace() {
+		return this.namespace;
+	}
+
+	public void putHeader(String key, String value) {
+		this.header.put(key, value);
+	}
+
+	public String getHeader(String key) {
+		return this.header.getString(key);
+	}
+
+	public static synchronized String nextID() {
+		id = id++;
+		if (id >= Long.MAX_VALUE)
+			id = 0;
+		return prefix + id;
+	}
+
+	public static Packet createResultPacket(final Packet request) {
+		if (StringUtil.isEmpty(request.getAction())) {
+			throw new IllegalArgumentException(
+					"IQ must be of type 'set' or 'get'. Original IQ: "
+							+ request.toString());
+		}
+		final Packet result = new Packet();
+		result.setAction(Packet.ACTION_WRITE);
+		result.setPacketID(request.getPacketID());
+		result.setFrom(request.getTo());
+		result.setTo(request.getFrom());
+		result.setHeader(request.getHeader());
+		return result;
+	}
+
+	public static Packet createErrorResponse(final Packet request,PacketError error) {
+		final Packet result = new Packet();
+		result.setAction(Packet.ACTION_WRITE);
+		result.setPacketID(request.getPacketID());
+		result.setFrom(request.getTo());
+		result.setTo(request.getFrom());
+		result.setStatus(error.getStatus());
+		result.setHeader(request.getHeader());
+		JSONObject body = new JSONObject();
+		body.put("reason", error.getReason());
+		result.setBody(body);
+		return result;
+	}
 }

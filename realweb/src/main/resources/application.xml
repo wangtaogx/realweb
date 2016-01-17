@@ -37,16 +37,13 @@
 	-->
 </modules>
 <handlers>
-	<!--
 	<handler>
-		<namespace>exampleHandler</namespace>
-		<classname>com.tao.realweb.modules.system.handlers.system.example.ExampleHandler</classname>
-		<description>Handler处理例子</description>
+		<namespace>http://tj.com/namespace/masterconnection</namespace>
+		<classname>com.tao.realweb.modules.system.handlers.system.connection.MasterConnectionHandler</classname>
+		<description>ConnectionHandler</description>
 		<parameters>
-			
 		</parameters>
 	</handler>
-	-->
 </handlers>
 <interceptors>
 	<!--

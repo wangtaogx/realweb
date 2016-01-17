@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<pluginname>NettyPlugin</pluginname>
+	<classname>com.tao.realweb.plugins.system.netty.NettyPlugin</classname>
+	<description>NettyPlugin启动</description>
+	<parameters>
+	<netty.port>9007</netty.port>
+	</parameters>
+</plugin>

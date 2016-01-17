@@ -17,48 +17,17 @@ import com.tao.realweb.modules.basic.ModuleManager;
 import com.tao.realweb.modules.system.handlers.basic.Handler;
 import com.tao.realweb.modules.system.handlers.basic.HandlerInfo;
 import com.tao.realweb.modules.system.handlers.basic.HandlerListener;
-import com.tao.realweb.modules.system.handlers.basic.HazelcastHandlerProvider;
-import com.tao.realweb.modules.system.handlers.basic.RemoteHandlerProvider;
 
 public class HandlerManager extends AbstractModule {
 
 	private Logger logger = LoggerFactory.getLogger(HandlerManager.class); 
 	private Map<String,Handler> handlersMap = new ConcurrentHashMap<String, Handler>();
-	private List<Element> handlers;
 	private List<HandlerListener> listeners = new ArrayList<HandlerListener>();
-	private RemoteHandlerProvider provider;
 	public HandlerManager(){
 	}
-	/*private void initHandlerListener() {
-		this.addHandlerListener(new HandlerListener(){
-
-			public void handlerAdded(String namespace) {
-				Redisson redisson = RedisConfig.createRedisson();
-				Set<RealWebServerInfo> set = redisson.getSet(namespace);
-				set.add(RealWebServer.getInstance().getServerInfo());
-				//redisson.shutdown();
-			}
-
-			public void handlerRemoved(String namespace) {
-				Redisson redisson = RedisConfig.createRedisson();
-				Set<RealWebServerInfo> set = redisson.getSet(namespace);
-				set.remove(RealWebServer.getInstance().getServerInfo());
-				//redisson.shutdown();
-			}
-
-			public void handlerReloadToCache() {
-				Redisson redisson = RedisConfig.createRedisson();
-				for(Handler h :handlersMap.values() ){
-					Set<RealWebServerInfo> set = redisson.getSet(h.getHandlerInfo().getNamespace());
-					set.add(RealWebServer.getInstance().getServerInfo());
-				}
-				
-			}
-			
-		});
-	}*/
-	public void init(){
+	private void initLocalHandlers(){
 		logger.info("初始化--Handler开始...");
+		List<Element> handlers = null;
 		Document document = getModuleManager().getRealWebServer().getRealWebConfig().getDocument();
 		if(document != null){
 			handlers = document.selectNodes("/application/handlers/handler");
@@ -75,6 +44,9 @@ public class HandlerManager extends AbstractModule {
 					}
 				}
 			}
+		}
+		if(handlers == null){
+			return ;
 		}
 		for(Element ele : handlers){
 			String namespace = ele.elementText("namespace");
@@ -105,13 +77,11 @@ public class HandlerManager extends AbstractModule {
 	}
 	public void putHandler(String namespace,Handler handler){
 		handlersMap.put(namespace, handler);
-		//fireHandlerListenerAdded(namespace);
-		this.addRemoteServerUsername(namespace);
+		fireHandlerListenerAdded(namespace);
 	}
 	public void removeHandler(String namespace){
 		handlersMap.remove(namespace);
-		//fireHandlerListenerRemoved(namespace);
-		this.removeRemoteServerUsername(namespace);
+		fireHandlerListenerRemoved(namespace);
 	}
 	public Handler getHandler(String namespace){
 		return handlersMap.get(namespace);
@@ -125,39 +95,15 @@ public class HandlerManager extends AbstractModule {
 	public void removeHandlerListener(HandlerListener listener){
 		this.listeners.remove(listener);
 	}
-	private void fireHandlerListenerAdded(String namespace){
+	public void fireHandlerListenerAdded(String namespace){
 		for(HandlerListener listener : listeners){
 			listener.handlerAdded(namespace);
 		}
 	}
-	private void fireHandlerListenerRemoved(String namespace){
+	public void fireHandlerListenerRemoved(String namespace){
 		for(HandlerListener listener : listeners){
 			listener.handlerRemoved(namespace);
 		}
-	}
-	public void fireHandlerListenerReloadToCache(){
-		for(HandlerListener listener : listeners){
-			listener.handlerReloadToCache();
-		}
-	}
-	
-	public String getRemoteServerUsername(String namespace){
-		if(provider != null){
-			return provider.getServerUsername(namespace);
-		}
-		return null;
-	}
-	public void addRemoteServerUsername(String namespace){
-		if(provider == null){
-			return;
-		}
-		provider.addServerUsername(namespace,getModuleManager().getRealWebServer().getServerInfo().getServerUsername());
-	}
-	public void removeRemoteServerUsername(String namespace){
-		if(provider == null){
-			return;
-		}
-		provider.removeServerUsername(namespace);
 	}
 	public boolean containsHandler(String namespace){
 		return handlersMap.containsKey(namespace);
@@ -166,13 +112,7 @@ public class HandlerManager extends AbstractModule {
 	@Override
 	public void init(ModuleManager moduleManager, ModuleInfo info) {
 		super.init(moduleManager, info);
-		try{
-			provider = new HazelcastHandlerProvider(getModuleManager().getHazelCastManager().getHazelcastInstance());
-			init();
-		}catch(Exception e){
-			e.printStackTrace();
-			provider = null;
-		}
+		initLocalHandlers();
 	}
 	public void start() {
 		

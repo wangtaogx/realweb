@@ -9,8 +9,7 @@ public abstract class AbstractSession implements Session {
 	private JID jid;
 	private Date createDate = new Date();
 	private Date lastActiveDate = new Date();
-	private boolean isValidate = false;
-	private Status status = Status.offline;
+	private String clientName;
 	public AbstractSession(String jidStr){
 		this.jid = JID.formatJID(jidStr);
 	}
@@ -20,24 +19,23 @@ public abstract class AbstractSession implements Session {
 	public Date getCreationDate() {
 		return this.createDate;
 	}
-	public Status getStatus() {
-		return status;
-	}
 	public Date getLastActiveDate() {
 		return lastActiveDate;
-	}
-	public boolean validate() {
-		return this.isValidate;
-	}
-	public void setStatus(int code) {
-		this.status = Status.fromCode(code);
-		
 	}
 	public void setLastActiveDate(Date lastDate) {
 		this.lastActiveDate = lastDate;
 	}
-	 public void setValidate(boolean isValidate){
-		 this.isValidate =isValidate;
-	 }
+	@Override
+	public String getServerName() {
+		return getAddress().getServerName();
+	}
+	@Override
+	public String getClientName() {
+		return this.clientName;
+	}
+	@Override
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
 	
 }

@@ -4,5 +4,4 @@ public interface HandlerListener {
 
 	public void handlerAdded(String namespace);
 	public void handlerRemoved(String namespace);
-	public void handlerReloadToCache();
 }

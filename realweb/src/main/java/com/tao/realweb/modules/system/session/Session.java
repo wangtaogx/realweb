@@ -38,17 +38,6 @@ import com.tao.realweb.bean.Packet;
  * @author Gaston Dombiak
  */
 public interface Session extends Serializable {
-
-    /**
-     * Version of the XMPP spec supported as MAJOR_VERSION.MINOR_VERSION (e.g. 1.0).
-     */
-	public static final int MAJOR_VERSION = 1;
-    public static final int MINOR_VERSION = 0;
-
-    public static final int STATUS_CLOSED = -1;
-    public static final int STATUS_CONNECTED = 1;
-    public static final int STATUS_AUTHENTICATED = 3;
-
     /**
       * Obtain the address of the user. The address is used by services like the core
       * server packet router to determine if a packet should be sent to the handler.
@@ -58,15 +47,6 @@ public interface Session extends Serializable {
       * @return the address of the packet handler.
       */
     public JID getAddress();
-
-    /**
-     * Obtain the current status of this session.
-     *
-     * @return The status code for this session
-     */
-    public Status getStatus();
-    public void setStatus(int code);
-
 
     /**
      * Obtain the name of the server this session belongs to.
@@ -116,7 +96,7 @@ public interface Session extends Serializable {
      * @return  the raw IP address in a string format.
      * @throws java.net.UnknownHostException if IP address of host could not be determined.
      */
-    public String getHostAddress() throws UnknownHostException;
+    public String getClientAddress() throws UnknownHostException;
     /**
      * Gets the host name for this IP address.
      *
@@ -143,41 +123,7 @@ public interface Session extends Serializable {
      * @see java.net.InetAddress#getCanonicalHostName
      * @see SecurityManager#checkConnect
      */
-    public String getHostName() throws UnknownHostException;
- 
-    public boolean validate();
-    public void setValidate(boolean isValidate);
+    public String getClientName();
+    public void setClientName(String clientName);
     public void sendMessage(Packet packet);
-    
-    public static enum Status{
-		online(1,"在线"),
-		offline(2,"断线");
-		private int code;
-		private String desc;
-		Status(int code,String desc){
-			this.code = code;
-			this.desc = desc;
-		}
-		public int getCode() {
-			return code;
-		}
-		public void setCode(int code) {
-			this.code = code;
-		}
-		public String getDesc() {
-			return desc;
-		}
-		public void setDesc(String desc) {
-			this.desc = desc;
-		}
-		public static Status fromCode(int code){
-			for(Status s: Status.values()){
-				if(s.getCode() == code){
-					return s;
-				}
-			}
-			return Status.offline;
-		}
-		
-	}
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.tao.realweb.plugins.basic.AbstractPlugin;
 import com.tao.realweb.plugins.basic.PluginInfo;
 import com.tao.realweb.plugins.basic.PluginManager;
+import com.tao.realweb.util.StringUtil;
 
 public class JettyPlugin extends AbstractPlugin{
 
@@ -17,7 +18,8 @@ public class JettyPlugin extends AbstractPlugin{
 	public void init(PluginManager pluginManager, PluginInfo info) {
 		super.init(pluginManager, info);
 		try{
-			server = new Server(8080);  
+			int port = StringUtil.toInt(getPluginInfo().getParameter("jetty.port"));
+			server = new Server(port);  
 	        WebAppContext context = new WebAppContext();  
 	        context.setContextPath("/jersey");  
 	        context.setDescriptor("F:/products/communication/jersey/WebRoot/WEB-INF/web.xml");  

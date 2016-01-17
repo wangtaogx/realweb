@@ -15,7 +15,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 import com.hazelcast.core.MessageListener;
-import com.tao.realweb.bean.IQ;
+import com.tao.realweb.bean.Packet;
 import com.tao.realweb.bean.JID;
 import com.tao.realweb.bean.Packet;
 import com.tao.realweb.conf.system.RealWebConstants;
@@ -45,7 +45,7 @@ public class HazelCastManager extends AbstractModule {
 		Set<Member> members = instance.getCluster().getMembers();
 		for(Member m : members){
 			if(!m.getUuid().equals(moduleManager.getRealWebServer().getServerInfo().getHostname())){
-				IQueue<IQ> queue = instance.getQueue(m.getUuid());
+				IQueue<Packet> queue = instance.getQueue(m.getUuid());
 				otherQueueMap.put(m.getUuid(),new ServerQueue(queue,true,m.getUuid()));
 			}
 		}
@@ -76,7 +76,7 @@ public class HazelCastManager extends AbstractModule {
 			
 			public void memberAdded(MembershipEvent arg0) {
 				Member m = arg0.getMember();
-				IQueue<IQ> other = instance.getQueue(m.getUuid());
+				IQueue<Packet> other = instance.getQueue(m.getUuid());
 				ServerQueue q = new ServerQueue(other, true, m.getUuid());
 				otherQueueMap.put(m.getUuid(), q);
 				

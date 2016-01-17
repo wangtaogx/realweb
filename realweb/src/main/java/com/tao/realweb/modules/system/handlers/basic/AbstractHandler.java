@@ -1,6 +1,7 @@
 package com.tao.realweb.modules.system.handlers.basic;
 
-import com.tao.realweb.bean.IQ;
+import com.alibaba.fastjson.JSONObject;
+import com.tao.realweb.bean.Packet;
 import com.tao.realweb.container.RealWebServer;
 import com.tao.realweb.modules.system.handlers.HandlerManager;
 
@@ -15,8 +16,10 @@ public abstract  class AbstractHandler implements Handler {
 	}
 
 	
-	public IQ processPacket(IQ iq) {
-		return IQ.createResultIQ(iq);
+	public Packet processPacket(Packet iq) {
+		Packet result = Packet.createResultPacket(iq);
+		result.setBody(iq.getBody());
+		return result;
 	}
 
 	public HandlerInfo getHandlerInfo() {

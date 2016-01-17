@@ -1,11 +1,10 @@
-package com.tao.realweb.modules.system.session;
-
-import java.net.UnknownHostException;
+package com.tao.realweb.plugins.system.socketio;
 
 import com.corundumstudio.socketio.SocketIOClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tao.realweb.bean.Packet;
+import com.tao.realweb.modules.system.session.AbstractSession;
 
 public class SocketIOSession extends AbstractSession{
 
@@ -29,11 +28,11 @@ public class SocketIOSession extends AbstractSession{
 	}
 
 
-	public String getHostAddress() throws UnknownHostException {
+	public String getClientAddress() {
 		return this.client.getHandshakeData().getAddress().getHostString();
 	}
 
-	public String getHostName() throws UnknownHostException {
+	public String getClientName() {
 		return this.client.getHandshakeData().getAddress().getHostName();
 	}
 	

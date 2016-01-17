@@ -3,7 +3,7 @@ package com.tao.realweb.modules.system.hazelcast;
 import java.io.Serializable;
 
 import com.hazelcast.core.IQueue;
-import com.tao.realweb.bean.IQ;
+import com.tao.realweb.bean.Packet;
 
 public class ServerQueue implements Serializable{
 
@@ -11,20 +11,20 @@ public class ServerQueue implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private IQueue<IQ> queue;
+	private IQueue<Packet> queue;
 	private boolean state;
 	private String uuid;
 	
 	
-	public ServerQueue(IQueue<IQ> queue, boolean state, String uuid) {
+	public ServerQueue(IQueue<Packet> queue, boolean state, String uuid) {
 		this.queue = queue;
 		this.state = state;
 		this.uuid = uuid;
 	}
-	public IQueue<IQ> getQueue() {
+	public IQueue<Packet> getQueue() {
 		return queue;
 	}
-	public void setQueue(IQueue<IQ> queue) {
+	public void setQueue(IQueue<Packet> queue) {
 		this.queue = queue;
 	}
 	public boolean isState() {
