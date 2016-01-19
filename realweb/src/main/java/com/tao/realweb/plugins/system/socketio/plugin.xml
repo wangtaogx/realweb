@@ -4,6 +4,6 @@
 	<classname>com.tao.realweb.plugins.system.socketio.SocketIOPlugin</classname>
 	<description>SocketIOPlugin启动</description>
 	<parameters>
-		<socketio.port>9094</socketio.port>
+		<socketio.port>6750</socketio.port>
 	</parameters>
 </plugin>

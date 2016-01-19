@@ -24,12 +24,12 @@ public class ServerStarter {
 			final ClassLoader parent = findParentClassLoader();
 			String realWebHome = System.getProperty("realwebHome");
 			System.out.println(realWebHome);
-			File homeDir = new File(realWebHome);
-			if (StringUtil.isEmpty(realWebHome) || !homeDir.exists()) {
+			if (StringUtil.isEmpty(realWebHome) || !new File(realWebHome).exists()) {
 				System.out.println("Home directory " + realWebHome
 						+ " does not exist. ");
 				return;
 			}
+			File homeDir = new File(realWebHome);
 
 			File libDir = new File(homeDir, "lib");
 			File configDir = new File(homeDir, "config");

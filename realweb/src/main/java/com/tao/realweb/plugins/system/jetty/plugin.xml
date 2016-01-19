@@ -4,6 +4,6 @@
 	<classname>com.tao.realweb.plugins.system.jetty.JettyPlugin</classname>
 	<description>JettyPlugin启动</description>
 	<parameters>
-		<jetty.port>8083</jetty.port>
+		<jetty.port>8086</jetty.port>
 	</parameters>
 </plugin>
