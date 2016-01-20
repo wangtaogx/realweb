@@ -20,10 +20,13 @@
 		<realweb.config>${realweb.home}/config</realweb.config>
 		<realweb.bin>${realweb.home}/bin</realweb.bin>
 		<realweb.plugins>${realweb.home}/plugins</realweb.plugins>
+		<realweb.plugintemp>${realweb.home}/plugintemp</realweb.plugintemp>
 		<realweb.resources>${realweb.home}/resources</realweb.resources>
 		<realweb.resources.images>${realweb.resources}/images</realweb.resources.images>
-		<realweb.plugins.jetty>${realweb.plugins}/jetty</realweb.plugins.jetty>
-		<realweb.plugins.socketio>${realweb.plugins}/socketio</realweb.plugins.socketio>
+		<realweb.plugins.jetty>${realweb.plugintemp}/jetty</realweb.plugins.jetty>
+		<realweb.plugins.jetty.target>${realweb.plugintemp}</realweb.plugins.jetty.target>
+		<realweb.plugins.socketio>${realweb.plugintemp}/socketio</realweb.plugins.socketio>
+		<realweb.plugins.socketio.target>${realweb.plugintemp}</realweb.plugins.socketio.target>
 		<realweb.plugins.example>${realweb.plugins}/example</realweb.plugins.example>
 		<realweb.plugins.netty>${realweb.plugins}/netty</realweb.plugins.netty>
 	</properties>
@@ -218,7 +221,7 @@
 						<configuration>
 							<classesDirectory>${realweb.plugins.jetty}</classesDirectory>
 							<finalName>jetty</finalName>
-							<outputDirectory>${realweb.plugins}</outputDirectory>
+							<outputDirectory>${realweb.plugins.jetty.target}</outputDirectory>
 							<archive>
 								<addMavenDescriptor>false</addMavenDescriptor> 
 							</archive>
@@ -233,7 +236,7 @@
 						<configuration>
 							<classesDirectory>${realweb.plugins.socketio}</classesDirectory>
 							<finalName>socketio</finalName>
-							<outputDirectory>${realweb.plugins}</outputDirectory>
+							<outputDirectory>${realweb.plugins.socketio.target}</outputDirectory>
 							<archive>
 								<addMavenDescriptor>false</addMavenDescriptor> 
 							</archive>

@@ -1,8 +1,5 @@
 package com.tao.realweb.plugins.system.socketio;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.tao.realweb.modules.system.routing.PacketRoutingManager;
 import com.tao.realweb.modules.system.session.SessionManager;
 import com.tao.realweb.plugins.basic.AbstractPlugin;
@@ -12,7 +9,6 @@ import com.tao.realweb.util.StringUtil;
 
 public class SocketIOPlugin extends AbstractPlugin{
 
-	private Logger logger = LoggerFactory.getLogger(SocketIOPlugin.class);
 	private SessionManager sessionManager;
 	private PacketRoutingManager packetRoutingManager;
 	private SocketIOManager socketIOManager;
@@ -57,6 +53,7 @@ public class SocketIOPlugin extends AbstractPlugin{
 	}
 	@Override
 	public void destroy() {
+		super.destroy();
 		socketIOManager.stop();
 	}
 

@@ -1,8 +1,6 @@
 package com.tao.realweb.modules.system.handlers.basic;
 
-import com.alibaba.fastjson.JSONObject;
 import com.tao.realweb.bean.Packet;
-import com.tao.realweb.container.RealWebServer;
 import com.tao.realweb.modules.system.handlers.HandlerManager;
 
 public abstract  class AbstractHandler implements Handler {

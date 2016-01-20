@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,97 +27,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.tao.realweb.container.RealWebServer;
-import com.tao.realweb.util.Dom4JSupport;
-import com.tao.realweb.util.ResourceClassLoader;
 
 public class PluginManager {
 
 	private static Logger logger = LoggerFactory.getLogger(PluginManager.class);
 	private static PluginManager instance = null;
-	private Map<String,Plugin> pluginsMap = new ConcurrentHashMap<String, Plugin>();
-	private List<Element> plugins = null;
 	private static Object lock = new Object();
 	private RealWebServer realWebServer;
 	private File pluginDirectory;
-	private Map<Plugin, PluginClassLoader> classloadersMap;
-	private Map<Plugin, File> pluginDirsMap;
+	private Map<String,Plugin> pluginsMap = new ConcurrentHashMap<String, Plugin>();
+	private Map<String, PluginClassLoader> classloadersMap;
+	private Map<String, File> pluginDirsMap;
 	private Map<String, File> pluginFilesMap;
 	private PluginMonitor pluginMonitor;
 	private ScheduledExecutorService executor = null;
 	
-	private PluginManager(RealWebServer server){
-		realWebServer =server;
-	    pluginDirsMap = new HashMap<Plugin, File>();
-        pluginFilesMap = new HashMap<String, File>();
-        pluginMonitor = new PluginMonitor();
-        classloadersMap = new HashMap<Plugin, PluginClassLoader>();
-		logger.info("加载插件--开始...");
-		Document document = this.realWebServer.getRealWebConfig().getDocument();
-		if(document != null){
-			plugins= document.selectNodes("/application/plugins/plugin");
-			if(plugins != null){
-				for(Element ele : plugins){
-					String className = ele.elementText("classname");
-					try{
-					Class clazz = Class.forName(className);
-					Object plugin = clazz.newInstance();
-					pluginsMap.put(className, (Plugin)plugin);
-					}catch(Exception e){
-						e.printStackTrace();
-						logger.info("加载插件失败:"+className);
-					}
-					
-				}
-			}
-		}
-		logger.info("加载插件--结束");
+	private PluginManager(){
+		
 	}
-	public static PluginManager getInstance(RealWebServer server){
+	public static PluginManager getInstance(){
 		if(instance == null){
 			synchronized (lock) {
 				if(instance == null){
-					instance = new PluginManager(server);
+					instance = new PluginManager();
 				}
 			}
 		}
 		return instance;
 	}
 	public void init(RealWebServer server){
-		logger.info("初始化--插件开始...");
-		if(plugins != null){
-			for(Element ele : plugins){
-				String pluginName = ele.elementText("pluginname");
-				String className = ele.elementText("classname");
-				String description = ele.elementText("description");
-				Element parameters = ele.element("parameters");
-				try{
-					PluginInfo info = new PluginInfo();
-					info.setPluginName(pluginName);
-					info.setDescription(description);
-					info.setClassName(className);
-					if(parameters != null){
-						List<Element> elements = parameters.elements();
-						for(Element e : elements){
-							info.addParameter(e.getName(), e.getTextTrim());
-						}
-					}
-					Plugin plugin = pluginsMap.get(className);
-					if(plugin != null)
-						plugin.init(this, info);
-				}catch(Exception e){
-					e.printStackTrace();
-					pluginsMap.remove(className);
-					logger.info("初始化插件错误"+className);
-				}
-			}
-		}
-		logger.info("初始化--插件结束");
+		this.realWebServer =server;
+	    pluginDirsMap = new HashMap<String, File>();
+        pluginFilesMap = new HashMap<String, File>();
+        pluginMonitor = new PluginMonitor();
+        classloadersMap = new HashMap<String, PluginClassLoader>();
 	}
 	public void startPlugins(){
-		for(String key : pluginsMap.keySet()){
-			pluginsMap.get(key).start();
-		}
-		
 		executor = new ScheduledThreadPoolExecutor(1);
         // See if we're in development mode. If so, check for new plugins once every 5 seconds.
         // Otherwise, default to every 20 seconds.
@@ -220,6 +163,7 @@ public class PluginManager {
                             }
                         }
                         else {
+                        	pluginFilesMap.remove(pluginName);
                             unloadPlugin(pluginName);
                         }
                         // If the delete operation was a success, unzip the plugin.
@@ -264,6 +208,7 @@ public class PluginManager {
                 List<String> toDelete = new ArrayList<String>();
                 for (File pluginDir : dirs) {
                     String pluginName = pluginDir.getName();
+                    pluginDirsMap.put(pluginName, pluginDir);
                     if (!jarSet.contains(pluginName + ".jar")) {
                         toDelete.add(pluginName);
                     }
@@ -343,7 +288,6 @@ public class PluginManager {
             }
         }
 
-
     /**
      * Deletes a directory.
      *
@@ -357,19 +301,6 @@ public class PluginManager {
             // be under contention. We do this by always sorting the lib directory
             // first.
             List<String> children = new ArrayList<String>(Arrays.asList(childDirs));
-            Collections.sort(children, new Comparator<String>() {
-                public int compare(String o1, String o2) {
-                    if (o1.equals("lib")) {
-                        return -1;
-                    }
-                    if (o2.equals("lib")) {
-                        return 1;
-                    }
-                    else {
-                        return o1.compareTo(o2);
-                    }
-                }
-            });
             for (String file : children) {
                 boolean success = deleteDir(new File(dir, file));
                 if (!success) {
@@ -378,10 +309,6 @@ public class PluginManager {
             }
         }
         boolean deleted = !dir.exists() || dir.delete();
-        if (deleted) {
-            // Remove the JAR/WAR file that created the plugin folder
-            pluginFilesMap.remove(dir.getName());
-        }
         return deleted;
     }
     public void unloadPlugin(String pluginName) {
@@ -405,54 +332,53 @@ public class PluginManager {
         // Anyway, for a few seconds admins may not see the plugin in the admin console
         // and in a subsequent refresh it will appear if failed to be removed
         pluginsMap.remove(pluginName);
-        File pluginFile = pluginDirsMap.remove(plugin);
-        
-        PluginClassLoader pluginLoader = classloadersMap.remove(plugin);
+        File pluginFile  = pluginFilesMap.remove(pluginName);
+        File pluginDir = pluginDirsMap.remove(pluginName);
+        PluginClassLoader pluginLoader = classloadersMap.remove(pluginName);
 
         // try to close the cached jar files from the plugin class loader
         if (pluginLoader != null) {
         	pluginLoader.unloadJarFiles();
-        } else {
-        //	Log.warn("No plugin loader found for " + pluginName);
         }
 
-        // Try to remove the folder where the plugin was exploded. If this works then
-        // the plugin was successfully removed. Otherwise, some objects created by the
-        // plugin are still in memory.
-        File dir = new File(pluginDirectory, pluginName);
         // Give the plugin 2 seconds to unload.
         try {
-            Thread.sleep(2000);
-            // Ask the system to clean up references.
-            System.gc();
-            int count = 0;
-            while (!deleteDir(dir) && count++ < 5) {
-                Thread.sleep(8000);
-                // Ask the system to clean up references.
-                System.gc();
-            }
-        } catch (InterruptedException e) {
+        	if(pluginDir != null){
+	            Thread.sleep(2000);
+	            // Ask the system to clean up references.
+	            System.gc();
+	            int count = 0;
+	            while (!deleteDir(pluginDir) && count++ < 5) {
+	                Thread.sleep(8000);
+	                // Ask the system to clean up references.
+	                System.gc();
+	            }
+        	}
+        	 if (pluginFile != null) {
+        		 deleteDir(pluginFile);
+             }
+        } catch (Exception e) {
         }
 
-       if (plugin != null && dir.exists()) {
+       if (plugin != null && pluginDir.exists()) {
             // Restore references since we failed to remove the plugin
             pluginsMap.put(pluginName, plugin);
-            pluginDirsMap.put(plugin, pluginFile);
-            classloadersMap.put(plugin, pluginLoader);
+            pluginDirsMap.put(pluginName, pluginDir);
+            pluginFilesMap.put(pluginName, pluginFile);
+            classloadersMap.put(pluginName, pluginLoader);
         }
     }
     private void loadPlugin(File pluginDir) {
         // Only load the admin plugin during setup mode.
         Plugin plugin;
         try {
-            File pluginConfig = new File(pluginDir, "plugin.xml");
+        	File pluginConfig = new File(pluginDir, "plugin.xml");
             if (pluginConfig.exists()) {
                 SAXReader saxReader = new SAXReader();
                 saxReader.setEncoding("UTF-8");
                 Document pluginXML = saxReader.read(pluginConfig);
                 String pluginName = pluginDir.getName();
-                PluginClassLoader pluginLoader;
-                pluginLoader = new PluginClassLoader();
+                PluginClassLoader pluginLoader = new PluginClassLoader();
                 pluginLoader.addDirectory(pluginDir, false);
                 PluginInfo info = new PluginInfo();
                 String className = pluginXML.selectSingleNode("/plugin/classname").getText().trim();
@@ -460,8 +386,8 @@ public class PluginManager {
                 info.setPluginName(pluginDir.getName());
                 plugin = (Plugin)(pluginLoader.loadClass(className).newInstance());
                 pluginsMap.put(pluginName, plugin);
-                pluginDirsMap.put(plugin, pluginDir);
-                classloadersMap.put(plugin, pluginLoader);
+                pluginDirsMap.put(pluginName, pluginDir);
+                classloadersMap.put(pluginName, pluginLoader);
                 Element parameters =  (Element) pluginXML.selectSingleNode("/plugin/parameters");
                 if(parameters != null){
                 	List<Element> elements = parameters.elements();
@@ -469,12 +395,14 @@ public class PluginManager {
 						info.addParameter(e.getName(), e.getTextTrim());
 					}
                 }
+                plugin.setDocument(pluginXML);
                 plugin.init(this, info);
                 plugin.start();
             }
         }
         catch (Throwable e) {
         	e.printStackTrace();
+        	unloadPlugin(pluginDir.getName());
         }
     }
 	public File getPluginDirectory() {

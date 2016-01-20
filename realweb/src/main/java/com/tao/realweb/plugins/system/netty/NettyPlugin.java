@@ -12,17 +12,19 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.tao.realweb.modules.system.handlers.HandlerManager;
+import com.tao.realweb.modules.system.handlers.basic.HandlerInfo;
 import com.tao.realweb.plugins.basic.AbstractPlugin;
+import com.tao.realweb.plugins.basic.PluginInfo;
+import com.tao.realweb.plugins.basic.PluginManager;
+import com.tao.realweb.plugins.system.netty.masterconnection.MasterConnectionHandler;
 import com.tao.realweb.util.StringUtil;
 
 public class NettyPlugin extends AbstractPlugin {
 
-	private Logger logger = LoggerFactory.getLogger(NettyPlugin.class);
 	EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
 	EventLoopGroup workerGroup = new NioEventLoopGroup();
+	private HandlerManager handlerManager ;
 	private void runNettyServer(int port){
         try {
             ServerBootstrap b = new ServerBootstrap(); // (2)
@@ -52,12 +54,21 @@ public class NettyPlugin extends AbstractPlugin {
 
 	}
 	@Override
+	public void init(PluginManager pluginManager, PluginInfo info) {
+		super.init(pluginManager, info);
+		handlerManager = pluginManager.getRealWebServer().getModuleManager().getHandlerManager();
+		MasterConnectionHandler masterConnectionHandler = new MasterConnectionHandler();
+		HandlerInfo masterConnectionHandlerInfo = new HandlerInfo();
+		masterConnectionHandlerInfo.setNamespace(MasterConnectionHandler.NAMESPACE_SERVER_MASTER_CONNECTION);
+		handlerManager.putHandler(MasterConnectionHandler.NAMESPACE_SERVER_MASTER_CONNECTION, masterConnectionHandler);
+	}
+	@Override
 	public void start() {
 		new Thread() {
 			public void run() {
 				try {
 					int port = StringUtil.toInt(getPluginInfo().getParameter("netty.port"));
-					logger.debug(getPluginInfo().getPluginName()+"   start......................"+"in "+port);
+					logger.debug(getPluginInfo().getClassName()+" start in "+port +"......................");
 					runNettyServer(port);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -68,6 +79,8 @@ public class NettyPlugin extends AbstractPlugin {
 
 	@Override
 	public void destroy() {
+		super.destroy();
+		handlerManager.removeHandler(MasterConnectionHandler.NAMESPACE_SERVER_MASTER_CONNECTION);
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
 	}

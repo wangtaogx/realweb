@@ -6,4 +6,13 @@
 	<parameters>
 	<netty.port>9007</netty.port>
 	</parameters>
+	<handlers>
+		<handler>
+			<namespace>http://tj.com/namespace/masterconnection</namespace>
+			<classname>com.tao.realweb.plugins.system.netty.masterconnection.MasterConnectionHandler</classname>
+			<description>Masterconnection</description>
+			<parameters>
+			</parameters>
+		</handler>
+	</handlers> 
 </plugin>

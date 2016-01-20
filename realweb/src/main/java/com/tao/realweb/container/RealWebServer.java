@@ -38,7 +38,7 @@ public class RealWebServer {
 		modulerManager = ModuleManager.getInstance(this);
 		modulerManager.init();
 		modulerManager.startModules();
-		pluginManager = PluginManager.getInstance(this);
+		pluginManager = PluginManager.getInstance();
 		File pluginDir = new File(realWebConfig.getString("realweb.plugin.dir"));
 		pluginManager.setPluginDirectory(pluginDir);
 		pluginManager.init(this);

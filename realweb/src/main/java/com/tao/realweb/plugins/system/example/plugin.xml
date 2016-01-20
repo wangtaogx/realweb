@@ -3,4 +3,16 @@
 	<pluginname>ExamplePlugin</pluginname>
 	<classname>com.tao.realweb.plugins.system.example.ExamplePlugin</classname>
 	<description>ExamplePlugin</description>
+	<parameters>
+	<example.port>9007</example.port>
+	</parameters>
+	<handlers>
+		<handler>
+			<namespace>http://tj.com/namespace/example</namespace>
+			<classname>com.tao.realweb.plugins.system.example.ExampleHandler</classname>
+			<description>ExampleHandler</description>
+			<parameters>
+			</parameters>
+		</handler>
+	</handlers> 
 </plugin>
